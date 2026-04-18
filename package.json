@@ -1,0 +1,25 @@
+{
+  "name": "type-challenge",
+  "version": "1.0.0",
+  "description": "[type-challenges](https://github.com/type-challenges/type-challenges)를 함께 풀며 Typescript 타입 시스템에 대한 이해를 높이는 스터디입니다.",
+  "main": "index.js",
+  "scripts": {},
+  "dependencies": {
+    "@type-challenges/utils": "^0.1.1"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/client-zzang/type-challenge.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/client-zzang/type-challenge/issues"
+  },
+  "homepage": "https://github.com/client-zzang/type-challenge#readme"
+}
