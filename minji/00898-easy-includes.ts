@@ -65,7 +65,7 @@ type cases = [
 - 배열을 재귀적으로 순회할 때, 빈 배열일 때를 고려해야 한다.
 - T extends U: 정확한 일치를 비교하는 게 아님. 할당 가능성을 검사하는 것. "T가 U에 포함된다"라고 이해하기
 
-- boolean과 true/falase, readonly와 readonly가 아닌 객체 비교: 
+- boolean과 true/falase, readonly와 readonly가 아닌 객체 비교: 타입 동일성 비교 필요
 
 
 - 핵심 개념
