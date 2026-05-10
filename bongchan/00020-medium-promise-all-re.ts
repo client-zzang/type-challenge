@@ -1,0 +1,91 @@
+/*
+  20 - Promise.all
+  -------
+  by Anthony Fu (@antfu) #medium #array #promise
+
+  ### Question
+
+  Type the function `PromiseAll` that accepts an array of PromiseLike objects, the returning value should be `Promise<T>` where `T` is the resolved result array.
+
+  ```ts
+  const promise1 = Promise.resolve(3);
+  const promise2 = 42;
+  const promise3 = new Promise<string>((resolve, reject) => {
+    setTimeout(resolve, 100, 'foo');
+  });
+
+  // expected to be `Promise<[number, 42, string]>`
+  const p = PromiseAll([promise1, promise2, promise3] as const)
+  ```
+
+  > View on GitHub: https://tsch.js.org/20
+*/
+
+// 🚀 시작: 2026-05-10 21:35
+// ✅ 종료: 2026-05-10 21:43
+// 🥺 정답 확인 여부: X
+
+/*
+  🤔 접근
+    1. 테스트 케이스의 제네릭 대응
+
+      declare function PromiseAll<T extends any[]>(values: T): any;
+
+    2. Homomorphic Mapped Type
+
+      declare function PromiseAll<T extends any[]>(
+        values: T,
+      ): Promise<{
+        [P in keyof T]: T[P] extends Promise<infer R> | infer R ? R : never;
+      }>;
+
+      - Expect는 튜플을 기대하는데 결과는 배열 타입이라 에러 발생
+
+    3. 결과를 튜플(readonly)로 설정
+
+      declare function PromiseAll<T extends any[]>(
+        values: readonly [...T],
+      ): Promise<{
+        [P in keyof T]: T[P] extends Promise<infer R> | infer R ? R : never;
+      }>;
+
+  😆 배움
+    -
+
+*/
+
+/* _____________ Your Code Here _____________ */
+
+declare function PromiseAll<T extends any[]>(
+  values: readonly [...T],
+): Promise<{
+  [P in keyof T]: T[P] extends Promise<infer R> | infer R ? R : never;
+}>;
+
+/* _____________ Test Cases _____________ */
+import type { Equal, Expect } from '@type-challenges/utils';
+
+const promiseAllTest1 = PromiseAll([1, 2, 3] as const);
+const promiseAllTest2 = PromiseAll([1, 2, Promise.resolve(3)] as const);
+const promiseAllTest3 = PromiseAll([1, 2, Promise.resolve(3)]);
+const promiseAllTest4 = PromiseAll<Array<number | Promise<number>>>([1, 2, 3]);
+const promiseAllTest5 = PromiseAll<(number | Promise<string>)[]>([
+  1,
+  2,
+  Promise.resolve('3'),
+]);
+
+type cases = [
+  Expect<Equal<typeof promiseAllTest1, Promise<[1, 2, 3]>>>,
+  Expect<Equal<typeof promiseAllTest2, Promise<[1, 2, number]>>>,
+  Expect<Equal<typeof promiseAllTest3, Promise<[number, number, number]>>>,
+  Expect<Equal<typeof promiseAllTest4, Promise<number[]>>>,
+  Expect<Equal<typeof promiseAllTest5, Promise<(number | string)[]>>>,
+];
+
+/* _____________ Further Steps _____________ */
+/*
+  > Share your solutions: https://tsch.js.org/20/answer
+  > View solutions: https://tsch.js.org/20/solutions
+  > More Challenges: https://tsch.js.org
+*/
