@@ -57,6 +57,9 @@ const fn1 = (v: boolean, w: any) => v ? 1 : 2
 */
 
 /*
+연관 문제: easy - parameters https://github.com/type-challenges/type-challenges/blob/main/questions/03312-easy-parameters/README.md
+키워드: infer, extends, Function
+
 <T extends (...args: any[]) => any>
 : 이 타입은 함수 타입만 받는다는 뜻
 - ...args: any[] : 아무 인자 타입 가능
