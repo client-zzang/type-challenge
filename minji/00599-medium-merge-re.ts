@@ -48,7 +48,7 @@ type cases = [
     c: boolean
   }>>,
 ]
-
+ 
 /* _____________ Further Steps _____________ */
 /*
   > Share your solutions: https://tsch.js.org/599/answer
