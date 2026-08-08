@@ -36,3 +36,11 @@ type cases2 = [
   Expect<Equal<ExpectedValue, OmitValue>>, // ✅
 ];
 ```
+
+## Uncapitalize를 활용한 첫 번째 문자 소문자 변환
+
+예) 00612-medium-kebabcase
+
+```ts
+type A = Uncapitalize<'HelloWorld'>; // helloWorld
+```
