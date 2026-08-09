@@ -1,0 +1,66 @@
+/*
+  4471 - Zip
+  -------
+  by キリサメ qianxi (@qianxi0410) #medium #tuple
+
+  ### Question
+
+  In This Challenge, You should implement a type `Zip<T, U>`, T and U must be `Tuple`
+  ```ts
+  type exp = Zip<[1, 2], [true, false]> // expected to be [[1, true], [2, false]]
+  ```
+
+  > View on GitHub: https://tsch.js.org/4471
+*/
+
+// 🚀 시작: 2026-08-09 12:48
+// ✅ 종료: 2026-08-09 13:02
+// 🥺 정답 확인 여부: X
+
+/*
+  🤔 접근
+    1.
+      1-1. 배열 구조의 infer, rest infer 활용
+
+        type Zip<T extends Array<unknown>, U extends Array<unknown>> = T extends [
+          infer TF,
+          ...infer TR,
+        ]
+          ? U extends [infer UF, ...infer UR]
+            ? [[TF, UF], ...Zip<TR, UR>]
+            : []
+          : [];
+
+  😆 배움
+    - 
+
+*/
+
+/* _____________ Your Code Here _____________ */
+
+type Zip<T extends Array<unknown>, U extends Array<unknown>> = T extends [
+  infer TF,
+  ...infer TR,
+]
+  ? U extends [infer UF, ...infer UR]
+    ? [[TF, UF], ...Zip<TR, UR>]
+    : []
+  : [];
+
+/* _____________ Test Cases _____________ */
+import type { Equal, Expect } from '@type-challenges/utils';
+
+type cases = [
+  Expect<Equal<Zip<[], []>, []>>,
+  Expect<Equal<Zip<[1, 2], [true, false]>, [[1, true], [2, false]]>>,
+  Expect<Equal<Zip<[1, 2, 3], ['1', '2']>, [[1, '1'], [2, '2']]>>,
+  Expect<Equal<Zip<[], [1, 2, 3]>, []>>,
+  Expect<Equal<Zip<[[1, 2]], [3]>, [[[1, 2], 3]]>>,
+];
+
+/* _____________ Further Steps _____________ */
+/*
+  > Share your solutions: https://tsch.js.org/4471/answer
+  > View solutions: https://tsch.js.org/4471/solutions
+  > More Challenges: https://tsch.js.org
+*/
