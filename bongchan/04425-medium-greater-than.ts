@@ -96,6 +96,60 @@
         ? GreaterThan<T, U, [...Index, 1], false>
         : R;
 
+    1. 📌 정답 수정(2026-08-09)
+
+      같은 길이에서 앞자리가 크고 뒷자리가 작은 경우 (기존 풀이의 버그 케이스)
+
+      - Expect<Equal<GreaterThan<21, 12>, true>>,
+      - Expect<Equal<GreaterThan<12, 21>, false>>,
+      - Expect<Equal<GreaterThan<300, 299>, true>>,
+
+      type Greater = {
+        '0': '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
+        '1': '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
+        '2': '3' | '4' | '5' | '6' | '7' | '8' | '9';
+        '3': '4' | '5' | '6' | '7' | '8' | '9';
+        '4': '5' | '6' | '7' | '8' | '9';
+        '5': '6' | '7' | '8' | '9';
+        '6': '7' | '8' | '9';
+        '7': '8' | '9';
+        '8': '9';
+        '9': never;
+      };
+
+      type GreaterUnits = keyof Greater;
+
+      type StringToArray<T extends string> = T extends `${infer F}${infer R}`
+        ? [F, ...StringToArray<R>]
+        : [];
+
+      type IsLonger<A extends Array<string>, B extends Array<string>> = A extends [
+        string,
+        ...infer AR extends Array<string>,
+      ]
+        ? B extends [string, ...infer BR extends Array<string>]
+          ? IsLonger<AR, BR>
+          : true
+        : false;
+
+      type GreaterThan<
+        T extends number,
+        U extends number,
+        Index extends Array<number> = [],
+        TArray extends Array<string> = StringToArray<`${T}`>,
+        UArray extends Array<string> = StringToArray<`${U}`>,
+      > = TArray['length'] extends UArray['length']
+        ? TArray[Index['length']] extends GreaterUnits
+          ? UArray[Index['length']] extends GreaterUnits
+            ? TArray[Index['length']] extends UArray[Index['length']]
+              ? GreaterThan<T, U, [...Index, 1]>
+              : TArray[Index['length']] extends Greater[UArray[Index['length']]]
+                ? true
+                : false
+            : false
+          : false
+        : IsLonger<TArray, UArray>;
+
   😆 배움
     - 다른 풀이
 
@@ -145,22 +199,32 @@ type StringToArray<T extends string> = T extends `${infer F}${infer R}`
   ? [F, ...StringToArray<R>]
   : [];
 
+type IsLonger<A extends Array<string>, B extends Array<string>> = A extends [
+  string,
+  ...infer AR extends Array<string>,
+]
+  ? B extends [string, ...infer BR extends Array<string>]
+    ? IsLonger<AR, BR>
+    : true
+  : false;
+
 type GreaterThan<
   T extends number,
   U extends number,
   Index extends Array<number> = [],
-  R extends boolean = true,
   TArray extends Array<string> = StringToArray<`${T}`>,
   UArray extends Array<string> = StringToArray<`${U}`>,
-> = TArray[Index['length']] extends GreaterUnits
-  ? UArray[Index['length']] extends GreaterUnits
-    ? TArray[Index['length']] extends Greater[UArray[Index['length']]]
-      ? GreaterThan<T, U, [...Index, 1]>
-      : GreaterThan<T, U, [...Index, 1], false>
-    : GreaterThan<T, U, [...Index, 1], true>
-  : UArray[Index['length']] extends GreaterUnits
-    ? GreaterThan<T, U, [...Index, 1], false>
-    : R;
+> = TArray['length'] extends UArray['length']
+  ? TArray[Index['length']] extends GreaterUnits
+    ? UArray[Index['length']] extends GreaterUnits
+      ? TArray[Index['length']] extends UArray[Index['length']]
+        ? GreaterThan<T, U, [...Index, 1]>
+        : TArray[Index['length']] extends Greater[UArray[Index['length']]]
+          ? true
+          : false
+      : false
+    : false
+  : IsLonger<TArray, UArray>;
 
 /* _____________ Test Cases _____________ */
 import type { Equal, Expect } from '@type-challenges/utils';
@@ -175,6 +239,10 @@ type cases = [
   Expect<Equal<GreaterThan<10, 100>, false>>,
   Expect<Equal<GreaterThan<111, 11>, true>>,
   Expect<Equal<GreaterThan<1234567891011, 1234567891010>, true>>,
+  // 📌 같은 길이에서 앞자리가 크고 뒷자리가 작은 경우 (기존 풀이의 버그 케이스)
+  Expect<Equal<GreaterThan<21, 12>, true>>,
+  Expect<Equal<GreaterThan<12, 21>, false>>,
+  Expect<Equal<GreaterThan<300, 299>, true>>,
 ];
 
 /* _____________ Further Steps _____________ */
