@@ -44,3 +44,29 @@ type cases2 = [
 ```ts
 type A = Uncapitalize<'HelloWorld'>; // helloWorld
 ```
+
+## 빈객체를 확인하는 방법
+
+예) 00949-medium-anyof-re
+
+```ts
+type A = {} extends {} ? true : false; // ✅ true
+type B = { bong: true } extends {} ? true : false; // ❌ true
+
+type IsEmptyObject<T> = T extends { [key: PropertyKey]: never } ? true : false;
+
+type C = IsEmptyObject<{}> extends true ? true : false; // ✅ true
+type D = IsEmptyObject<{ bong: true }> extends true ? true : false; // ✅ false
+
+// 빈배열 확인
+type E = [] extends [] ? true : false; // true
+type F = [1] extends [] ? true : false; // false
+
+// extends {} 형태는 배열을 구분하지 못 함
+type G = [] extends {} ? true : false; // ❌ true
+type H = [1] extends {} ? true : false; // ❌ true
+
+// extends { [key: PropertyKey]: never } 형태는 빈객체 뿐만 아니라 배열도 구분함
+type I = IsEmptyObject<[]> extends true ? true : false; // ✅ false
+type J = IsEmptyObject<[1]> extends true ? true : false; // ✅ false
+```
