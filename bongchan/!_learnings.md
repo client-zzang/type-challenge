@@ -1,5 +1,12 @@
 # ☺️ 오늘도 성장했어
 
+## 목차
+
+1. [Omit을 활용한 평탄화](#omit을-활용한-평탄화)
+2. [Uncapitalize를 활용한 첫 번째 문자 소문자 변환](#uncapitalize를-활용한-첫-번째-문자-소문자-변환)
+3. [빈객체를 확인하는 방법](#빈객체를-확인하는-방법)
+4. [배열을 유니온으로 변환](#배열을-유니온으로-변환)
+
 ## Omit을 활용한 평탄화
 
 타입챌린지에서 `Equal` 비교를 할 때, `A & B`(Intersection Types) 형태면 에러 발생
@@ -72,6 +79,8 @@ type J = IsEmptyObject<[1]> extends true ? true : false; // ✅ false
 ```
 
 ## 배열을 유니온으로 변환
+
+예) 05117-medium-without
 
 ```ts
 type ToUnion<T> = T extends unknown[] ? T[number] : T;
