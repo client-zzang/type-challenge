@@ -70,3 +70,11 @@ type H = [1] extends {} ? true : false; // ❌ true
 type I = IsEmptyObject<[]> extends true ? true : false; // ✅ false
 type J = IsEmptyObject<[1]> extends true ? true : false; // ✅ false
 ```
+
+## 배열을 유니온으로 변환
+
+```ts
+type ToUnion<T> = T extends unknown[] ? T[number] : T;
+
+type A = ToUnion<[1, 2, 3]>; // 1 | 2 | 3
+```
