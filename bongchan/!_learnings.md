@@ -6,6 +6,7 @@
 2. [Uncapitalize를 활용한 첫 번째 문자 소문자 변환](#uncapitalize를-활용한-첫-번째-문자-소문자-변환)
 3. [빈객체를 확인하는 방법](#빈객체를-확인하는-방법)
 4. [배열을 유니온으로 변환](#배열을-유니온으로-변환)
+5. [재사용 가능한 infer 변수를 추출과 extends 분기](#재사용-가능한-infer-변수를-추출과-extends-분기)
 
 ## Omit을 활용한 평탄화
 
@@ -86,4 +87,21 @@ type J = IsEmptyObject<[1]> extends true ? true : false; // ✅ false
 type ToUnion<T> = T extends unknown[] ? T[number] : T;
 
 type A = ToUnion<[1, 2, 3]>; // 1 | 2 | 3
+```
+
+## 재사용 가능한 infer 변수를 추출과 extends 분기
+
+예) 01978-medium-percentage-parser
+
+```ts
+type CheckPrefix<T> = T extends '+' | '-' ? T : never; // ✅ never 반환이 핵심
+type Check<T> = T extends `${CheckPrefix<infer F>}${infer R}` // ✅ + 또는 -를 담는 infer를 가지면서 never 반환으로 extends 분기
+  ? [F, R]
+  : ['', T];
+
+type A = '+100';
+type ResultA = Check<A>; // ["+", "100"]
+
+type B = '100';
+type ResultB = Check<B>; // ["", "100
 ```
