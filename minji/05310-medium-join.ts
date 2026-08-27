@@ -22,7 +22,6 @@
 type Join<T extends string[], U extends string | number = ',', S extends string = ''> = T extends [infer F extends string, ...infer R extends string[]]
   ? Join<R, U, S extends '' ? `${F}` : `${S}${U}${F}`>
   : S
-
 /* _____________ Test Cases _____________ */
 import type { Equal, Expect } from '@type-challenges/utils'
 
