@@ -7,6 +7,7 @@
 3. [빈객체를 확인하는 방법](#빈객체를-확인하는-방법)
 4. [배열을 유니온으로 변환](#배열을-유니온으로-변환)
 5. [재사용 가능한 infer 변수를 추출과 extends 분기](#재사용-가능한-infer-변수를-추출과-extends-분기)
+6. [숫자로 구성된 string 타입을 number 타입으로 변환](#숫자로-구성된-string-타입을-number-타입으로-변환)
 
 ## Omit을 활용한 평탄화
 
@@ -104,4 +105,18 @@ type ResultA = Check<A>; // ["+", "100"]
 
 type B = '100';
 type ResultB = Check<B>; // ["", "100
+```
+
+## 숫자로 구성된 string 타입을 number 타입으로 변환
+
+예) 02257-medium-minusone
+
+```ts
+type ToNumber<T extends string> = T extends `${infer Digit extends number}`
+  ? Digit
+  : never;
+
+type A = ToNumber<'1'>; // ✅ 1
+type B = ToNumber<'01'>; // ❌ number
+type C = ToNumber<'a1'>; // ❌ never
 ```
