@@ -8,6 +8,7 @@
 4. [배열을 유니온으로 변환](#배열을-유니온으로-변환)
 5. [재사용 가능한 infer 변수를 추출과 extends 분기](#재사용-가능한-infer-변수를-추출과-extends-분기)
 6. [숫자로 구성된 string 타입을 number 타입으로 변환](#숫자로-구성된-string-타입을-number-타입으로-변환)
+7. [never를 활용한 유니온 흡수(소멸)](#never를-활용한-유니온-흡수소멸)
 
 ## Omit을 활용한 평탄화
 
@@ -119,4 +120,26 @@ type ToNumber<T extends string> = T extends `${infer Digit extends number}`
 type A = ToNumber<'1'>; // ✅ 1
 type B = ToNumber<'01'>; // ❌ number
 type C = ToNumber<'a1'>; // ❌ never
+```
+
+## never를 활용한 유니온 흡수(소멸)
+
+예) 05821-medium-maptypes
+
+```ts
+type Mapper<
+  T,
+  R extends { mapFrom: unknown; mapTo: unknown },
+> = T extends R['mapFrom']
+  ? R extends { mapFrom: T }
+    ? R['mapTo']
+    : never
+  : T;
+
+type A = string;
+
+type Result = Mapper<
+  string,
+  { mapFrom: string; mapTo: number } | { mapFrom: Date; mapTo: string } // ✅ number
+>;
 ```
