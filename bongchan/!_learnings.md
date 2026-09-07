@@ -9,6 +9,7 @@
 5. [재사용 가능한 infer 변수를 추출과 extends 분기](#재사용-가능한-infer-변수를-추출과-extends-분기)
 6. [숫자로 구성된 string 타입을 number 타입으로 변환](#숫자로-구성된-string-타입을-number-타입으로-변환)
 7. [never를 활용한 유니온 흡수(소멸)](#never를-활용한-유니온-흡수소멸)
+8. [타입스크립트의 재귀 깊이 제한](#타입스크립트의-재귀-깊이-제한)
 
 ## Omit을 활용한 평탄화
 
@@ -105,7 +106,7 @@ type A = '+100';
 type ResultA = Check<A>; // ["+", "100"]
 
 type B = '100';
-type ResultB = Check<B>; // ["", "100
+type ResultB = Check<B>; // ["", "100"]
 ```
 
 ## 숫자로 구성된 string 타입을 number 타입으로 변환
@@ -142,4 +143,46 @@ type Result = Mapper<
   string,
   { mapFrom: string; mapTo: number } | { mapFrom: Date; mapTo: string } // ✅ number
 >;
+```
+
+## 타입스크립트의 재귀 깊이 제한
+
+예) 08640-medium-number-range
+
+타입스크립트에서 꼬리 재귀 최적화(TCO, Tail Call Optimization)가 적용되면 재귀를 최대 ~1000회까지 허용
+
+꼬리 재귀 최적화가 되지 않으면 ~50회까지 제한된다.
+
+**꼬리 위치(tail position)** = 재귀 호출의 결과를 받아서 더 할 일이 없는 자리.
+조건부 타입의 분기가 곧 재귀 호출이면 TS는 스택을 쌓지 않고 내부 루프로 돌린다.
+반대로 재귀 호출 위에 한 겹이라도 얹히면(유니온, 튜플, 인덱스 접근 등)
+결과가 돌아올 때까지 모든 단계를 기억해야 하므로 스택이 그대로 쌓인다.
+
+```ts
+// ✅ 꼬리 재귀: 분기가 곧 재귀 호출 → 최대 999회
+type Tail<N extends number, C extends any[] = []> = C['length'] extends N
+  ? C
+  : Tail<N, [...C, 1]>;
+
+type A = Tail<999>; // ✅
+type B = Tail<1000>; // ❌ ts(2589)
+
+// ❌ 비꼬리 재귀: 재귀 호출 위에 유니온이 한 겹 얹힘 → 최대 47회
+//    (`C['length'] | ...` 를 만들려면 재귀 결과를 "받아서" 합쳐야 함)
+type NonTail<N extends number, C extends any[] = []> = C['length'] extends N
+  ? never
+  : C['length'] | NonTail<N, [...C, 1]>;
+
+type C = NonTail<47>; // ✅
+type D = NonTail<50>; // ❌ ts(2589)
+
+// 💡 해결: 조립 작업을 "인자"로 옮기면(누적자 패턴) 다시 꼬리 위치가 된다
+//    올라오면서 유니온을 만들지 말고, 내려가면서 만들어 넘긴다
+type Acc<
+  N extends number,
+  C extends any[] = [],
+  R = never,
+> = C['length'] extends N ? R : Acc<N, [...C, 1], R | C['length']>;
+
+type E = Acc<999>; // ✅
 ```
