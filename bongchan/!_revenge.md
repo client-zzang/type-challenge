@@ -7,3 +7,7 @@
 04425-medium-greater-than (Greater Than)
 
 - 당한 날짜: 2026-10-11
+
+25270-medium-transpose (Transpose)
+
+- 당한 날짜: 2026-10-26
