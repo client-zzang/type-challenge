@@ -10,6 +10,7 @@
 6. [숫자로 구성된 string 타입을 number 타입으로 변환](#숫자로-구성된-string-타입을-number-타입으로-변환)
 7. [never를 활용한 유니온 흡수(소멸)](#never를-활용한-유니온-흡수소멸)
 8. [타입스크립트의 재귀 깊이 제한](#타입스크립트의-재귀-깊이-제한)
+9. [Homomorphic Mapped Type 조건](#homomorphic-mapped-type-조건)
 
 ## Omit을 활용한 평탄화
 
@@ -185,4 +186,66 @@ type Acc<
 > = C['length'] extends N ? R : Acc<N, [...C, 1], R | C['length']>;
 
 type E = Acc<999>; // ✅
+```
+
+## Homomorphic Mapped Type 조건
+
+튜플과 같은 형식을 Mapped Type 활용할 때 튜플 형식을 유지하기 위해서는 "타입 파라미터" 를 사용해야함
+
+예) 25270-medium-transpose
+
+```ts
+// "타입 파라미터"란 제네릭 타입 선언할 때 `<>` 안에 적는 이름
+// 제네릭 타입: T는 타입 파라미터
+type Identity<T> = T;
+type A = Identity<1>; // T 자리에 1이 들어감
+
+type Bad<M extends number[][]> = {
+  [P in keyof M[0]]: {
+    // ❌ M[0] 은 타입 파라미터 형태가 아니기 때문에 동형 타입이 유지되지 않음
+    [K in keyof M]: P extends keyof M[K] ? M[K][P] : never;
+  };
+};
+
+type BadTuple = Bad<[[1, 2], [3, 4]]>;
+
+/*
+
+❌ 우리가 의도한 결과는 [[1, 3], [2, 4]]
+
+type BadTuple = {
+    [x: number]: [2 | 1, 3 | 4];
+    0: [1, 3];
+    1: [2, 4];
+    length: [2, 2];
+    toString: [() => string, () => string];
+    toLocaleString: [{
+        (): string;
+        (locales: string | string[], options?: (Intl.NumberFormatOptions & Intl.DateTimeFormatOptions) | undefined): string;
+    }, {
+        (): string;
+        (locales: string | string[], options?: (Intl.NumberFormatOptions & Intl.DateTimeFormatOptions) | undefined): string;
+    }];
+    pop: [() => 2 | 1 | undefined, () => 3 | 4 | undefined];
+    push: [(...items: (2 | 1)[]) => number, (...items: (3 | 4)[]) => number];
+    concat: [{
+        (...items: ConcatArray<2 | 1>[]): (2 | 1)[];
+        (...items: (2 | ... 1 more ... | ConcatArray<...>)[]): (2 | 1)[];
+    }, {
+        ...;
+    }];
+    ... 34 more ...;
+    readonly [Symbol.unscopables]: [...];
+}
+
+*/
+
+type Good<M extends number[][], C extends number[] = M[0]> = {
+  [P in keyof C]: {
+    // ✅ Homomorphic Mapped Type 조건은 타입 파라미터 그 자체일 때만 튜플 모양 유지
+    [K in keyof M]: P extends keyof M[K] ? M[K][P] : never;
+  };
+};
+
+type GoodTuple = Good<[[1, 2], [3, 4]]>; // ✅ [[1, 3], [2, 4]]
 ```
