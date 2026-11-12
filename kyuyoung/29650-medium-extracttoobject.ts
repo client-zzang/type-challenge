@@ -1,3 +1,7 @@
+type ExtractToObject<T, U extends keyof T> = {
+  [K in keyof (Omit<T, U> & T[U])]: (Omit<T, U> & T[U])[K]
+}
+
 import type { Equal, Expect } from '@type-challenges/utils'
 
 type test1 = { id: '1', myProp: { foo: '2' } }
