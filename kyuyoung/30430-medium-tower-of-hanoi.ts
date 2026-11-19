@@ -1,0 +1,24 @@
+type Hanoi<
+  N extends number,
+  From = 'A',
+  To = 'B',
+  Intermediate = 'C',
+  C extends 1[] = []
+> = C['length'] extends N
+  ? []
+  : [
+      ...Hanoi<N, From, Intermediate, To, [...C, 1]>,
+      [From, To],
+      ...Hanoi<N, Intermediate, To, From, [...C, 1]>
+    ]
+
+/* _____________ Test Cases _____________ */
+import type { Equal, Expect } from '@type-challenges/utils'
+
+type Tests = [
+  Expect<Equal<Hanoi<0>, []>>,
+  Expect<Equal<Hanoi<1>, [['A', 'B']]>>,
+  Expect<Equal<Hanoi<2>, [['A', 'C'], ['A', 'B'], ['C', 'B']]>>,
+  Expect<Equal<Hanoi<3>, [['A', 'B'], ['A', 'C'], ['B', 'C'], ['A', 'B'], ['C', 'A'], ['C', 'B'], ['A', 'B']]>>,
+  Expect<Equal<Hanoi<5>, [['A', 'B'], ['A', 'C'], ['B', 'C'], ['A', 'B'], ['C', 'A'], ['C', 'B'], ['A', 'B'], ['A', 'C'], ['B', 'C'], ['B', 'A'], ['C', 'A'], ['B', 'C'], ['A', 'B'], ['A', 'C'], ['B', 'C'], ['A', 'B'], ['C', 'A'], ['C', 'B'], ['A', 'B'], ['C', 'A'], ['B', 'C'], ['B', 'A'], ['C', 'A'], ['C', 'B'], ['A', 'B'], ['A', 'C'], ['B', 'C'], ['A', 'B'], ['C', 'A'], ['C', 'B'], ['A', 'B']]>>,
+]
