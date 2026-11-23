@@ -11,6 +11,7 @@
 7. [never를 활용한 유니온 흡수(소멸)](#never를-활용한-유니온-흡수소멸)
 8. [타입스크립트의 재귀 깊이 제한](#타입스크립트의-재귀-깊이-제한)
 9. [Homomorphic Mapped Type 조건](#homomorphic-mapped-type-조건)
+10. [Record와 빈 객체로 확정 문자열 구분](#record와-빈-객체로-확정-문자열-구분)
 
 ## Omit을 활용한 평탄화
 
@@ -248,4 +249,35 @@ type Good<M extends number[][], C extends number[] = M[0]> = {
 };
 
 type GoodTuple = Good<[[1, 2], [3, 4]]>; // ✅ [[1, 3], [2, 4]]
+```
+
+## Record와 빈 객체로 확정 문자열 구분
+
+예) 30970-medium-isfixedstringliteraltype
+
+`Record`의 key에 문자열 타입을 넣으면 두 가지 형태로 갈린다.
+
+- 확정 문자열(`'ABC'`)은 **필수 속성**이 된다.
+- 무한 문자열(`string`, `` `ABC${number}` ``)은 **인덱스 시그니처**가 된다.
+
+인덱스 시그니처는 key가 0개여도 되므로 빈 객체 `{}`가 할당된다.
+
+```ts
+type R1 = Record<'ABC', 1>; // { ABC: 1 }
+type R2 = Record<`ABC${number}`, 1>; // { [x: `ABC${number}`]: 1 }
+type R3 = Record<string, 1>; // { [x: string]: 1 }
+
+type A = {} extends R1 ? true : false; // ✅ false → 확정 문자열
+type B = {} extends R2 ? true : false; // ✅ true → 무한 문자열
+type C = {} extends R3 ? true : false; // ✅ true → 무한 문자열
+
+// 템플릿 리터럴에 값이 하나뿐인 타입을 넣으면 확정 문자열이 된다
+type D = `${true}`; // "true"
+type E = `ABC${null}`; // "ABCnull"
+
+// boolean은 true | false 라서 유니온으로 펼쳐진다
+type F = `${boolean}`; // "false" | "true"
+
+// 유니온은 key가 여러 개인 객체가 되어 {} 비교로 구분하지 못한다 → IsUnion으로 따로 걸러야 함
+type G = {} extends Record<'ABC' | 'DEF', 1> ? true : false; // ❌ false (확정 문자열처럼 보임)
 ```
